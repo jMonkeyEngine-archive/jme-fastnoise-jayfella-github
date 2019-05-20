@@ -2,7 +2,6 @@ package com.jayfella.fastnoise;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
-import com.jme3.math.Vector2f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import com.jme3.system.AppSettings;
@@ -28,6 +27,7 @@ public class Main extends SimpleApplication {
 
         NoiseLayer noiseLayer = new NoiseLayer();
         noiseLayer.setSeed(213);
+        noiseLayer.setNoiseType(FastNoise.NoiseType.PerlinFractal);
 
         Texture2D texture2D = noiseLayer.generateTexture(720);
 

@@ -28,6 +28,10 @@ public class NoiseLayer {
     private float strength = 1;
     private Vector2f scale = new Vector2f(1, 1);
 
+    // fastnoise changes the GradientPerturbAmp value when you set it, so when we get it, it won't be the same value.
+    // So we'll keep a copy of what it's set to and get that, but we'll still set it on fastnoise.
+    private float gradientPerturbAmp = 2.2f;
+
     // serialization
     public NoiseLayer() {
         this("New Noise Layer");
@@ -35,6 +39,12 @@ public class NoiseLayer {
 
     public NoiseLayer(String name) {
         this(name, new FastNoise());
+    }
+
+    public NoiseLayer(String name, int seed) {
+        this(name, new FastNoise(seed));
+
+        this.primaryNoise.SetGradientPerturbAmp(gradientPerturbAmp);
     }
 
     public NoiseLayer(String name, FastNoise fastNoise) {
@@ -49,7 +59,7 @@ public class NoiseLayer {
 
         perturbNoise = new FastNoise();
         perturbNoise.SetFrequency(0.015f);
-        perturbNoise.SetGradientPerturbAmp(fastNoise.GetGradientPerturbAmp());
+        perturbNoise.SetGradientPerturbAmp(gradientPerturbAmp);
 
         this.gradientPerturb = GradientPerturb.Off;
 
@@ -361,12 +371,12 @@ public class NoiseLayer {
     }
 
     public float getGradientPerturbAmp() {
-        return primaryNoise.GetGradientPerturbAmp();
+        return gradientPerturbAmp;
     }
 
     public void setGradientPerturbAmp(float gradientPerturbAmp) {
+        this.gradientPerturbAmp = gradientPerturbAmp;
         primaryNoise.SetGradientPerturbAmp(gradientPerturbAmp);
-        perturbNoise.SetGradientPerturbAmp(gradientPerturbAmp);
     }
 
     public boolean isInverted() {
