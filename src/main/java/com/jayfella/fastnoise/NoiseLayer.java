@@ -2,6 +2,7 @@ package com.jayfella.fastnoise;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.image.ColorSpace;
@@ -68,6 +69,10 @@ public class NoiseLayer {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public FastNoise getPrimaryNoise() {
+        return primaryNoise;
+    }
+
     public FastNoise getPerturbNoise() { return perturbNoise; }
     public void setPerturbNoise(FastNoise perturbNoise) { this.perturbNoise = perturbNoise; }
 
@@ -102,6 +107,17 @@ public class NoiseLayer {
 
     }
 
+    private boolean get3d;
+    private float zPos = 0.5f;
+
+    public boolean isGet3d() {
+        return get3d;
+    }
+
+    public void setGet3d(boolean get3d) {
+        this.get3d = get3d;
+    }
+
     public Texture2D generateTexture(int size) {
 
         ByteBuffer buffer = BufferUtils.createByteBuffer(size * size * 4);
@@ -120,7 +136,7 @@ public class NoiseLayer {
 
         long current = 0;
 
-        boolean get3d = false;
+        // boolean get3d = false;
 
         float noise = 0;
 
@@ -131,7 +147,31 @@ public class NoiseLayer {
 
             if (get3d) {
 
+                for (int x = 0; x < size; x++) {
+                    for (int y = 0; y < size; y++) {
+
+                        Vector3f f = new Vector3f(x - halfSize, y - halfSize, zPos);
+
+                        switch (warpIndex) {
+                            case 1:
+                                perturbNoise.GradientPerturb(f);
+                                break;
+                            case 2:
+                                perturbNoise.GradientPerturbFractal(f);
+                                break;
+                        }
+                        //noise = fNoise.GetNoise(xf, yf, zf);
+                        noise = primaryNoise.GetNoise(f.x, f.y, f.z);
+
+                        avg += noise;
+                        maxN = Math.max(maxN, noise);
+                        minN = Math.min(minN, noise);
+                        noiseValues[index++] = noise;
+                    }
+
+                }
             }
+
             else {
 
                 for (int x = 0; x < size; x++) {
