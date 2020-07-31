@@ -25,7 +25,6 @@
 // The developer's email is jorzixdan.me2@gzixmail.com (for great email, take
 // off every 'zix'.)
 //
-// https://github.com/Auburns/FastNoise_Java/blob/master/FastNoise.java
 
 package com.jayfella.fastnoise;
 
@@ -40,13 +39,13 @@ public class FastNoise {
     public enum CellularReturnType {CellValue, NoiseLookup, Distance, Distance2, Distance2Add, Distance2Sub, Distance2Mul, Distance2Div}
 
     private int m_seed = 1337;
-    private float m_frequency = (float) 0.01;
+    private float m_frequency = 0.01f;
     private Interp m_interp = Interp.Quintic;
     private NoiseType m_noiseType = NoiseType.Simplex;
 
     private int m_octaves = 3;
-    private float m_lacunarity = (float) 2.0;
-    private float m_gain = (float) 0.5;
+    private float m_lacunarity = 2.0f;
+    private float m_gain = 0.5f;
     private FractalType m_fractalType = FractalType.FBM;
 
     private float m_fractalBounding;
@@ -55,7 +54,8 @@ public class FastNoise {
     private CellularReturnType m_cellularReturnType = CellularReturnType.CellValue;
     private FastNoise m_cellularNoiseLookup = null;
 
-    private float m_gradientPerturbAmp = (float) (1.0 / 0.45);
+    private float m_gradientPerturbAmpIn = 1.0f; // keep a track of the actual input value before we modify it.
+    private float m_gradientPerturbAmp = 1.0f / 0.45f;
 
     public FastNoise() {
         this(1337);
@@ -66,149 +66,205 @@ public class FastNoise {
         CalculateFractalBounding();
     }
 
-    // Returns a 0 float/double
-    public static float GetDecimalType() {
+    /**
+     * Returns a 0 float/double
+     * @return a 0 float/double
+     */
+    public static float getDecimalType() {
         return 0;
     }
 
-    // Returns the seed used by this object
-    public int GetSeed() {
+    /**
+     * Returns the seed used by this object
+     * @return the seed used by this object
+     */
+    public int getSeed() {
         return m_seed;
     }
 
-    // Sets seed used for all noise types
-    // Default: 1337
-    public void SetSeed(int seed) {
+    /**
+     * Sets seed used for all noise types
+     * Default: 1337
+     * @param seed the seed used for all noise types
+     */
+    public void setSeed(int seed) {
         m_seed = seed;
     }
 
-    // Sets frequency for all noise types
-    // Default: 0.01
-    public void SetFrequency(float frequency) {
-        m_frequency = frequency;
-    }
-
-    public float GetFrequency() {
+    public float getFrequency() {
         return m_frequency;
     }
 
-    // Changes the interpolation method used to smooth between noise values
-    // Possible interpolation methods (lowest to highest quality) :
-    // - Linear
-    // - Hermite
-    // - Quintic
-    // Used in Value, Gradient Noise and Position Perturbing
-    // Default: Quintic
-    public void SetInterp(Interp interp) {
-        m_interp = interp;
+    /**
+     * Sets frequency for all noise types
+     * Default: 0.01
+     *
+     * @param frequency frequency for all noise types
+     */
+    public void setFrequency(float frequency) {
+        m_frequency = frequency;
     }
 
-    public Interp GetInterp() {
+    public Interp getInterp() {
         return m_interp;
     }
 
-    // Sets noise return type of GetNoise(...)
-    // Default: Simplex
-    public void SetNoiseType(NoiseType noiseType) {
-        m_noiseType = noiseType;
+    /**
+     * Changes the interpolation method used to smooth between noise values
+     * Possible interpolation methods (lowest to highest quality) :
+     * - Linear
+     * - Hermite
+     * - Quintic
+     * Used in Value, Gradient Noise and Position Perturbing
+     * Default: Quintic
+     *
+     * @param interp the interpolation method used to smooth between noise values.
+     */
+    public void setInterp(Interp interp) {
+        m_interp = interp;
     }
 
-    public NoiseType GetNoiseType() {
+    public NoiseType getNoiseType() {
         return m_noiseType;
     }
 
-    // Sets octave count for all fractal noise types
-    // Default: 3
-    public void SetFractalOctaves(int octaves) {
+    /**
+     * Sets noise return type of getNoise(...)
+     * Default: Simplex
+     *
+     * @param noiseType noise return type of getNoise(...)
+     */
+    public void setNoiseType(NoiseType noiseType) {
+        m_noiseType = noiseType;
+    }
+
+    public int getFractalOctaves() {
+        return m_octaves;
+    }
+
+    /**
+     * Sets octave count for all fractal noise types
+     * Default: 3
+     * @param octaves octave count for all fractal noise types
+     */
+    public void setFractalOctaves(int octaves) {
         m_octaves = octaves;
         CalculateFractalBounding();
     }
 
-    public int GetFractalOctaves() {
-        return m_octaves;
-    }
-
-    // Sets octave lacunarity for all fractal noise types
-    // Default: 2.0
-    public void SetFractalLacunarity(float lacunarity) {
-        m_lacunarity = lacunarity;
-    }
-
-    public float GetFractalLacunarity() {
+    public float getFractalLacunarity() {
         return m_lacunarity;
     }
 
-    // Sets octave gain for all fractal noise types
-    // Default: 0.5
-    public void SetFractalGain(float gain) {
+    /**
+     * Sets octave lacunarity for all fractal noise types
+     * Default: 2.0
+     *
+     * @param lacunarity octave lacunarity for all fractal noise types
+     */
+    public void setFractalLacunarity(float lacunarity) {
+        m_lacunarity = lacunarity;
+    }
+
+    public float getFractalGain() {
+        return m_gain;
+    }
+
+    /**
+     * Sets octave gain for all fractal noise types
+     * Default: 0.5
+     * @param gain octave gain for all fractal noise types
+     */
+    public void setFractalGain(float gain) {
         m_gain = gain;
         CalculateFractalBounding();
     }
 
-    public float GetFractalGain() {
-        return m_gain;
-    }
-
-    // Sets method for combining octaves in all fractal noise types
-    // Default: FBM
-    public void SetFractalType(FractalType fractalType) {
-        m_fractalType = fractalType;
-    }
-
-    public FractalType GetFractalType() {
+    public FractalType getFractalType() {
         return m_fractalType;
     }
 
-    // Sets return type from cellular noise calculations
-    // Note: NoiseLookup requires another FastNoise object be set with SetCellularNoiseLookup() to function
-    // Default: CellValue
-    public void SetCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) {
-        m_cellularDistanceFunction = cellularDistanceFunction;
+    /**
+     * Sets method for combining octaves in all fractal noise types
+     * Default: FBM
+     *
+     * @param fractalType method for combining octaves in all fractal noise types
+     */
+    public void setFractalType(FractalType fractalType) {
+        m_fractalType = fractalType;
     }
 
-    public CellularDistanceFunction GetCellularDistanceFunction() {
+    public CellularDistanceFunction getCellularDistanceFunction() {
         return m_cellularDistanceFunction;
     }
 
-    // Sets distance function used in cellular noise calculations
-    // Default: Euclidean
-    public void SetCellularReturnType(CellularReturnType cellularReturnType) {
-        m_cellularReturnType = cellularReturnType;
+    /**
+     * Sets return type from cellular noise calculations
+     * Note: NoiseLookup requires another FastNoise object be set with SetCellularNoiseLookup() to function
+     * Default: CellValue
+     *
+     * @param cellularDistanceFunction return type from cellular noise calculations
+     */
+    public void setCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) {
+        m_cellularDistanceFunction = cellularDistanceFunction;
     }
 
-    public CellularReturnType GetCellularReturnType() {
+    public CellularReturnType getCellularReturnType() {
         return m_cellularReturnType;
     }
 
-    // Noise used to calculate a cell value if cellular return type is NoiseLookup
-    // The lookup value is acquired through GetNoise() so ensure you SetNoiseType() on the noise lookup, value, gradient or simplex is recommended
-    public void SetCellularNoiseLookup(FastNoise noise) {
+    /**
+     * Sets distance function used in cellular noise calculations
+     * Default: Euclidean
+     * @param cellularReturnType distance function used in cellular noise calculations
+     */
+    public void setCellularReturnType(CellularReturnType cellularReturnType) {
+        m_cellularReturnType = cellularReturnType;
+    }
+
+    public FastNoise getCellularNoiseLookup() {
+        return m_cellularNoiseLookup;
+    }
+
+    /**
+     * Noise used to calculate a cell value if cellular return type is NoiseLookup
+     * The lookup value is acquired through getNoise() so ensure you SetNoiseType() on the noise lookup, value, gradient or simplex is recommended
+     *
+     * @param noise Noise used to calculate a cell value if cellular return type is NoiseLookup
+     */
+    public void setCellularNoiseLookup(FastNoise noise) {
         m_cellularNoiseLookup = noise;
     }
 
-    // Sets the maximum perturb distance from original location when using GradientPerturb{Fractal}(...)
-    // Default: 1.0
-    public void SetGradientPerturbAmp(float gradientPerturbAmp) {
-        m_gradientPerturbAmp = gradientPerturbAmp / (float) 0.45;
+    public float getGradientPerturbAmp() {
+        // return the value we put in, rather than the value divided by 0.45f
+        return m_gradientPerturbAmpIn;
     }
 
-    public float GetGradientPerturbAmp() {
-        return m_gradientPerturbAmp;
+    /**
+     * Sets the maximum perturb distance from original location when using GradientPerturb{Fractal}(...)
+     * Default: 1.0
+     *
+     * @param gradientPerturbAmp the maximum perturb distance from original location when using GradientPerturb{Fractal}(...)
+     */
+    public void setGradientPerturbAmp(float gradientPerturbAmp) {
+        m_gradientPerturbAmpIn = gradientPerturbAmp;
+        m_gradientPerturbAmp = gradientPerturbAmp / 0.45f;
     }
 
     private static class Float2 {
-        public final float x, y;
+        private final float x, y;
 
-        public Float2(float x, float y) {
+        Float2(float x, float y) {
             this.x = x;
             this.y = y;
         }
     }
 
     private static class Float3 {
-        public final float x, y, z;
+        private final float x, y, z;
 
-        public Float3(float x, float y, float z) {
+        Float3(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -468,7 +524,7 @@ public class FastNoise {
         return ((hash & 4) == 0 ? -a : a) + ((hash & 2) == 0 ? -b : b) + ((hash & 1) == 0 ? -c : c);
     }
 
-    public float GetNoise(float x, float y, float z) {
+    public float getNoise(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -523,7 +579,7 @@ public class FastNoise {
                         return SingleCellular2Edge(x, y, z);
                 }
             case WhiteNoise:
-                return GetWhiteNoise(x, y, z);
+                return getWhiteNoise(x, y, z);
             case Cubic:
                 return SingleCubic(m_seed, x, y, z);
             case CubicFractal:
@@ -542,7 +598,7 @@ public class FastNoise {
         }
     }
 
-    public float GetNoise(float x, float y) {
+    public float getNoise(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -596,7 +652,7 @@ public class FastNoise {
                         return SingleCellular2Edge(x, y);
                 }
             case WhiteNoise:
-                return GetWhiteNoise(x, y);
+                return getWhiteNoise(x, y);
             case Cubic:
                 return SingleCubic(m_seed, x, y);
             case CubicFractal:
@@ -623,7 +679,7 @@ public class FastNoise {
         return i ^ (i >> 16);
     }
 
-    public float GetWhiteNoise(float x, float y, float z, float w) {
+    public float getWhiteNoise(float x, float y, float z, float w) {
         int xi = FloatCast2Int(x);
         int yi = FloatCast2Int(y);
         int zi = FloatCast2Int(z);
@@ -632,7 +688,7 @@ public class FastNoise {
         return ValCoord4D(m_seed, xi, yi, zi, wi);
     }
 
-    public float GetWhiteNoise(float x, float y, float z) {
+    public float getWhiteNoise(float x, float y, float z) {
         int xi = FloatCast2Int(x);
         int yi = FloatCast2Int(y);
         int zi = FloatCast2Int(z);
@@ -640,27 +696,27 @@ public class FastNoise {
         return ValCoord3D(m_seed, xi, yi, zi);
     }
 
-    public float GetWhiteNoise(float x, float y) {
+    public float getWhiteNoise(float x, float y) {
         int xi = FloatCast2Int(x);
         int yi = FloatCast2Int(y);
 
         return ValCoord2D(m_seed, xi, yi);
     }
 
-    public float GetWhiteNoiseInt(int x, int y, int z, int w) {
+    public float getWhiteNoiseInt(int x, int y, int z, int w) {
         return ValCoord4D(m_seed, x, y, z, w);
     }
 
-    public float GetWhiteNoiseInt(int x, int y, int z) {
+    public float getWhiteNoiseInt(int x, int y, int z) {
         return ValCoord3D(m_seed, x, y, z);
     }
 
-    public float GetWhiteNoiseInt(int x, int y) {
+    public float getWhiteNoiseInt(int x, int y) {
         return ValCoord2D(m_seed, x, y);
     }
 
     // Value Noise
-    public float GetValueFractal(float x, float y, float z) {
+    public float getValueFractal(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -728,7 +784,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetValue(float x, float y, float z) {
+    public float getValue(float x, float y, float z) {
         return SingleValue(m_seed, x * m_frequency, y * m_frequency, z * m_frequency);
     }
 
@@ -771,7 +827,7 @@ public class FastNoise {
         return Lerp(yf0, yf1, zs);
     }
 
-    public float GetValueFractal(float x, float y) {
+    public float getValueFractal(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -834,7 +890,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetValue(float x, float y) {
+    public float getValue(float x, float y) {
         return SingleValue(m_seed, x * m_frequency, y * m_frequency);
     }
 
@@ -868,7 +924,7 @@ public class FastNoise {
     }
 
     // Gradient Noise
-    public float GetPerlinFractal(float x, float y, float z) {
+    public float getPerlinFractal(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -936,7 +992,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetPerlin(float x, float y, float z) {
+    public float getPerlin(float x, float y, float z) {
         return SinglePerlin(m_seed, x * m_frequency, y * m_frequency, z * m_frequency);
     }
 
@@ -986,7 +1042,7 @@ public class FastNoise {
         return Lerp(yf0, yf1, zs);
     }
 
-    public float GetPerlinFractal(float x, float y) {
+    public float getPerlinFractal(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -1050,7 +1106,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetPerlin(float x, float y) {
+    public float getPerlin(float x, float y) {
         return SinglePerlin(m_seed, x * m_frequency, y * m_frequency);
     }
 
@@ -1089,7 +1145,7 @@ public class FastNoise {
     }
 
     // Simplex Noise
-    public float GetSimplexFractal(float x, float y, float z) {
+    public float getSimplexFractal(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -1157,7 +1213,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetSimplex(float x, float y, float z) {
+    public float getSimplex(float x, float y, float z) {
         return SingleSimplex(m_seed, x * m_frequency, y * m_frequency, z * m_frequency);
     }
 
@@ -1273,7 +1329,7 @@ public class FastNoise {
         return 32 * (n0 + n1 + n2 + n3);
     }
 
-    public float GetSimplexFractal(float x, float y) {
+    public float getSimplexFractal(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -1337,12 +1393,16 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetSimplex(float x, float y) {
+    public float getSimplex(float x, float y) {
         return SingleSimplex(m_seed, x * m_frequency, y * m_frequency);
     }
 
-    private final static float F2 = (float) (1.0 / 2.0);
-    private final static float G2 = (float) (1.0 / 4.0);
+    //private final static float F2 = (float) (1.0 / 2.0);
+    //private final static float G2 = (float) (1.0 / 4.0);
+
+    private final static float SQRT3 = (float) 1.7320508075688772935274463415059;
+    private final static float F2 = 0.5f * (SQRT3 - 1.0f);
+    private final static float G2 = (3.0f - SQRT3) / 6.0f;
 
     private float SingleSimplex(int seed, float x, float y) {
         float t = (x + y) * F2;
@@ -1367,8 +1427,8 @@ public class FastNoise {
 
         float x1 = x0 - i1 + G2;
         float y1 = y0 - j1 + G2;
-        float x2 = x0 - 1 + F2;
-        float y2 = y0 - 1 + F2;
+        float x2 = x0 - 1 + 2*G2;
+        float y2 = y0 - 1 + 2*G2;
 
         float n0, n1, n2;
 
@@ -1396,7 +1456,7 @@ public class FastNoise {
         return 50 * (n0 + n1 + n2);
     }
 
-    public float GetSimplex(float x, float y, float z, float w) {
+    public float getSimplex(float x, float y, float z, float w) {
         return SingleSimplex(m_seed, x * m_frequency, y * m_frequency, z * m_frequency, w * m_frequency);
     }
 
@@ -1505,7 +1565,7 @@ public class FastNoise {
     }
 
     // Cubic Noise
-    public float GetCubicFractal(float x, float y, float z) {
+    public float getCubicFractal(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -1576,7 +1636,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetCubic(float x, float y, float z) {
+    public float getCubic(float x, float y, float z) {
         return SingleCubic(m_seed, x * m_frequency, y * m_frequency, z * m_frequency);
     }
 
@@ -1630,7 +1690,7 @@ public class FastNoise {
     }
 
 
-    public float GetCubicFractal(float x, float y) {
+    public float getCubicFractal(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -1697,7 +1757,7 @@ public class FastNoise {
         return sum;
     }
 
-    public float GetCubic(float x, float y) {
+    public float getCubic(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -1733,7 +1793,7 @@ public class FastNoise {
     }
 
     // Cellular Noise
-    public float GetCellular(float x, float y, float z) {
+    public float getCellular(float x, float y, float z) {
         x *= m_frequency;
         y *= m_frequency;
         z *= m_frequency;
@@ -1831,7 +1891,7 @@ public class FastNoise {
 
             case NoiseLookup:
                 Float3 vec = CELL_3D[Hash3D(m_seed, xc, yc, zc) & 255];
-                return m_cellularNoiseLookup.GetNoise(xc + vec.x, yc + vec.y, zc + vec.z);
+                return m_cellularNoiseLookup.getNoise(xc + vec.x, yc + vec.y, zc + vec.z);
 
             case Distance:
                 return distance - 1;
@@ -1923,7 +1983,7 @@ public class FastNoise {
         }
     }
 
-    public float GetCellular(float x, float y) {
+    public float getCellular(float x, float y) {
         x *= m_frequency;
         y *= m_frequency;
 
@@ -2008,7 +2068,7 @@ public class FastNoise {
 
             case NoiseLookup:
                 Float2 vec = CELL_2D[Hash2D(m_seed, xc, yc) & 255];
-                return m_cellularNoiseLookup.GetNoise(xc + vec.x, yc + vec.y);
+                return m_cellularNoiseLookup.getNoise(xc + vec.x, yc + vec.y);
 
             case Distance:
                 return distance - 1;
@@ -2089,11 +2149,11 @@ public class FastNoise {
         }
     }
 
-    public void GradientPerturb(Vector3f v3) {
+    public void gradientPerturb(Vector3f v3) {
         SingleGradientPerturb(m_seed, m_gradientPerturbAmp, m_frequency, v3);
     }
 
-    public void GradientPerturbFractal(Vector3f v3) {
+    public void gradientPerturbFractal(Vector3f v3) {
         int seed = m_seed;
         float amp = m_gradientPerturbAmp * m_fractalBounding;
         float freq = m_frequency;
@@ -2176,11 +2236,11 @@ public class FastNoise {
         v3.z += Lerp(lz0y, Lerp(lz0x, lz1x, ys), zs) * perturbAmp;
     }
 
-    public void GradientPerturb(Vector2f v2) {
+    public void gradientPerturb(Vector2f v2) {
         SingleGradientPerturb(m_seed, m_gradientPerturbAmp, m_frequency, v2);
     }
 
-    public void GradientPerturbFractal(Vector2f v2) {
+    public void gradientPerturbFractal(Vector2f v2) {
         int seed = m_seed;
         float amp = m_gradientPerturbAmp * m_fractalBounding;
         float freq = m_frequency;
