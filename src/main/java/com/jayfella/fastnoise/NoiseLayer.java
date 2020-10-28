@@ -45,7 +45,7 @@ public class NoiseLayer {
     public NoiseLayer(String name, int seed) {
         this(name, new FastNoise(seed));
 
-        this.primaryNoise.SetGradientPerturbAmp(gradientPerturbAmp);
+        this.primaryNoise.setGradientPerturbAmp(gradientPerturbAmp);
     }
 
     public NoiseLayer(String name, FastNoise fastNoise) {
@@ -54,13 +54,13 @@ public class NoiseLayer {
         this.primaryNoise = fastNoise;
 
         lookupNoise = new FastNoise();
-        lookupNoise.SetFrequency(0.2f);
-        lookupNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        fastNoise.SetCellularNoiseLookup(lookupNoise);
+        lookupNoise.setFrequency(0.2f);
+        lookupNoise.setNoiseType(FastNoise.NoiseType.Simplex);
+        fastNoise.setCellularNoiseLookup(lookupNoise);
 
         perturbNoise = new FastNoise();
-        perturbNoise.SetFrequency(0.015f);
-        perturbNoise.SetGradientPerturbAmp(gradientPerturbAmp);
+        perturbNoise.setFrequency(0.015f);
+        perturbNoise.setGradientPerturbAmp(gradientPerturbAmp);
 
         this.gradientPerturb = GradientPerturb.Off;
 
@@ -90,14 +90,14 @@ public class NoiseLayer {
         switch (gradientPerturb.ordinal())
         {
             case 1:
-                perturbNoise.GradientPerturb(f);
+                perturbNoise.gradientPerturb(f);
                 break;
             case 2:
-                perturbNoise.GradientPerturbFractal(f);
+                perturbNoise.gradientPerturbFractal(f);
                 break;
         }
 
-        float noise = primaryNoise.GetNoise(f.x * scale.x, f.y * scale.y);
+        float noise = primaryNoise.getNoise(f.x * scale.x, f.y * scale.y);
 
         if (inverted) {
             noise = -noise;
@@ -140,7 +140,7 @@ public class NoiseLayer {
 
         float noise = 0;
 
-        if (!primaryNoise.GetNoiseType().toString().toLowerCase().endsWith("perturb")) {
+        if (!primaryNoise.getNoiseType().toString().toLowerCase().endsWith("perturb")) {
 
             float[] noiseValues = new float[size * size];
             int warpIndex = gradientPerturb.ordinal();
@@ -154,14 +154,14 @@ public class NoiseLayer {
 
                         switch (warpIndex) {
                             case 1:
-                                perturbNoise.GradientPerturb(f);
+                                perturbNoise.gradientPerturb(f);
                                 break;
                             case 2:
-                                perturbNoise.GradientPerturbFractal(f);
+                                perturbNoise.gradientPerturbFractal(f);
                                 break;
                         }
                         //noise = fNoise.GetNoise(xf, yf, zf);
-                        noise = primaryNoise.GetNoise(f.x, f.y, f.z);
+                        noise = primaryNoise.getNoise(f.x, f.y, f.z);
 
                         avg += noise;
                         maxN = Math.max(maxN, noise);
@@ -184,14 +184,14 @@ public class NoiseLayer {
                         switch (warpIndex)
                         {
                             case 1:
-                                perturbNoise.GradientPerturb(f);
+                                perturbNoise.gradientPerturb(f);
                                 break;
                             case 2:
-                                perturbNoise.GradientPerturbFractal(f);
+                                perturbNoise.gradientPerturbFractal(f);
                                 break;
                         }
 
-                        noise = primaryNoise.GetNoise(f.x, f.y);
+                        noise = primaryNoise.getNoise(f.x, f.y);
 
                         avg += noise;
                         maxN = Math.max(maxN, noise);
@@ -230,7 +230,7 @@ public class NoiseLayer {
         else {
 
             float[] noiseValues = new float[size * size * 3];
-            boolean fractal = primaryNoise.GetNoiseType().toString().toLowerCase().endsWith("fractal");
+            boolean fractal = primaryNoise.getNoiseType().toString().toLowerCase().endsWith("fractal");
 
             if (get3d) {
 
@@ -246,10 +246,10 @@ public class NoiseLayer {
                         Vector2f f = new Vector2f(x, y);
 
                         if (fractal) {
-                            primaryNoise.GradientPerturbFractal(f);
+                            primaryNoise.gradientPerturbFractal(f);
                         }
                         else {
-                            primaryNoise.GradientPerturb(f);
+                            primaryNoise.gradientPerturb(f);
                         }
 
                         f.x -= x;
@@ -321,9 +321,9 @@ public class NoiseLayer {
         this.seed = seed;
         Random random = new Random(seed);
 
-        primaryNoise.SetSeed(random.nextInt());
-        perturbNoise.SetSeed(random.nextInt());
-        lookupNoise.SetSeed(random.nextInt());
+        primaryNoise.setSeed(random.nextInt());
+        perturbNoise.setSeed(random.nextInt());
+        lookupNoise.setSeed(random.nextInt());
     }
 
     public int getSeed() {
@@ -331,75 +331,75 @@ public class NoiseLayer {
     }
 
     public FastNoise.NoiseType getNoiseType() {
-        return primaryNoise.GetNoiseType();
+        return primaryNoise.getNoiseType();
     }
 
     public void setNoiseType(FastNoise.NoiseType noiseType) {
-        primaryNoise.SetNoiseType(noiseType);
+        primaryNoise.setNoiseType(noiseType);
     }
 
     public float getFrequency() {
-        return primaryNoise.GetFrequency();
+        return primaryNoise.getFrequency();
     }
 
     public void setFrequency(float frequency) {
-        primaryNoise.SetFrequency(frequency);
+        primaryNoise.setFrequency(frequency);
     }
 
     public FastNoise.Interp getInterp() {
-        return primaryNoise.GetInterp();
+        return primaryNoise.getInterp();
     }
 
     public void setInterp(FastNoise.Interp interp) {
-        primaryNoise.SetInterp(interp);
+        primaryNoise.setInterp(interp);
     }
 
     public FastNoise.FractalType getFractalType() {
-        return primaryNoise.GetFractalType();
+        return primaryNoise.getFractalType();
     }
 
     public void setFractalType(FastNoise.FractalType fractalType) {
-        primaryNoise.SetFractalType(fractalType);
+        primaryNoise.setFractalType(fractalType);
     }
 
     public int getFractalOctaves() {
-        return primaryNoise.GetFractalOctaves();
+        return primaryNoise.getFractalOctaves();
     }
 
     public void setFractalOctaves(int fractalOctaves) {
-        primaryNoise.SetFractalOctaves(fractalOctaves);
+        primaryNoise.setFractalOctaves(fractalOctaves);
     }
 
     public float getFractalLacunarity() {
-        return primaryNoise.GetFractalLacunarity();
+        return primaryNoise.getFractalLacunarity();
     }
 
     public void setFractalLacunarity(float fractalLacunarity) {
-        primaryNoise.SetFractalLacunarity(fractalLacunarity);
+        primaryNoise.setFractalLacunarity(fractalLacunarity);
     }
 
     public float getFractalGain() {
-        return primaryNoise.GetFractalGain();
+        return primaryNoise.getFractalGain();
     }
 
     public void setFractalGain(float fractalGain) {
-        primaryNoise.SetFractalGain(fractalGain);
+        primaryNoise.setFractalGain(fractalGain);
     }
 
     public FastNoise.CellularDistanceFunction getCellularDistanceFunction() {
-        return primaryNoise.GetCellularDistanceFunction();
+        return primaryNoise.getCellularDistanceFunction();
     }
 
     public void setCellularDistanceFunction(FastNoise.CellularDistanceFunction cellularDistanceFunction) {
-        primaryNoise.SetCellularDistanceFunction(cellularDistanceFunction);
+        primaryNoise.setCellularDistanceFunction(cellularDistanceFunction);
     }
 
     public FastNoise.CellularReturnType getCellularReturnType() {
-        return primaryNoise.GetCellularReturnType();
+        return primaryNoise.getCellularReturnType();
     }
 
     public void setCellularReturnType(FastNoise.CellularReturnType cellularReturnType) {
-        primaryNoise.SetCellularReturnType(cellularReturnType);
+        primaryNoise.setCellularReturnType(cellularReturnType);
     }
 
     public GradientPerturb getGradientPerturb() {
@@ -416,7 +416,7 @@ public class NoiseLayer {
 
     public void setGradientPerturbAmp(float gradientPerturbAmp) {
         this.gradientPerturbAmp = gradientPerturbAmp;
-        primaryNoise.SetGradientPerturbAmp(gradientPerturbAmp);
+        primaryNoise.setGradientPerturbAmp(gradientPerturbAmp);
     }
 
     public boolean isInverted() {
